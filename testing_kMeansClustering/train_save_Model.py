@@ -16,7 +16,7 @@ import pickle
 
 data = pd.read_csv("mod_dataset/mod_data.csv")
 
-data[['DATE','TIME']] = data['DATETIME'].str.split(' ',expand=True)
+data[['DATE', 'TIME']] = data['DATETIME'].str.split(' ', expand=True)
 data['DATETIME'] = data['DATE']
 data['DATETIME'] = pd.to_datetime(data['DATETIME'], format='%d/%m/%y')
 data['DATE_DAY'] = data['DATETIME'].dt.day
@@ -32,35 +32,35 @@ data = data.drop('DATETIME', 1)
 data = data.apply(pd.to_numeric)
 data[data < 0] = 0
 
-X = data.iloc[:,0:47]  #independent columns
-y = data.iloc[:,-1]    #target column
+X = data.iloc[:, 0:47]  # independent columns
+y = data.iloc[:, -1]  # target column
 
 # best feature selection
 vari = 14
 bestfeatures = SelectKBest(score_func=chi2, k=vari)
-fit = bestfeatures.fit(X,y)
+fit = bestfeatures.fit(X, y)
 dfscores = pd.DataFrame(fit.scores_)
 dfcolumns = pd.DataFrame(X.columns)
-featureScores = pd.concat([dfcolumns,dfscores],axis=1)
-featureScores.columns = ['Feature','Score']
+featureScores = pd.concat([dfcolumns, dfscores], axis=1)
+featureScores.columns = ['Feature', 'Score']
 
 
-new_data_X = pd.DataFrame(data[list(featureScores.nlargest(vari,'Score')['Feature'])])
+new_data_X = pd.DataFrame(
+    data[list(featureScores.nlargest(vari, 'Score')['Feature'])])
 new_data_Y = pd.DataFrame(data['target'])
-new_data = pd.concat([new_data_X,new_data_Y],axis=1)
+new_data = pd.concat([new_data_X, new_data_Y], axis=1)
 
 traintesttratio = 0.02
 max_accuracy = 0
-while(traintesttratio<1):
+while(traintesttratio < 1):
     dissection = int(len(new_data) * traintesttratio)
-    train_data = new_data.iloc[0:dissection,:]
+    train_data = new_data.iloc[0:dissection, :]
     train_data_X = train_data.iloc[:, train_data.columns != 'target']
-    train_data_Y = train_data.iloc[:,-1]
+    train_data_Y = train_data.iloc[:, -1]
 
-    test_data = new_data.iloc[dissection:,:]
+    test_data = new_data.iloc[dissection:, :]
     test_data_X = test_data.iloc[:, test_data.columns != 'target']
-    test_data_Y = test_data.iloc[:,-1]
-
+    test_data_Y = test_data.iloc[:, -1]
 
     kmeans = KMeans(2)
     kmeans.fit(train_data_X, train_data_Y)

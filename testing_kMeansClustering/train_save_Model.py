@@ -67,18 +67,11 @@ while(traintesttratio < 1):
     predictions = kmeans.predict(test_data_X)
 
     # # print(classification_report(test_data_Y, predictions))
-    # print('Accuracy: {}'.format(accuracy_score(test_data_Y, predictions))*100)
-    traintesttratio += 0.01
+    traintesttratio += 0.001
     if(accuracy_score(test_data_Y, predictions) > max_accuracy):
         max_accuracy = accuracy_score(test_data_Y, predictions)
-print('Max Accuracy: {}'.format(max_accuracy*100))
-
-# print ("Model trained. Saving model to model.pickle")
-# with open("model.pickle", "wb") as file:
-#     pickle.dump(kmeans, file)
-# print ("Model saved.")
-
-# with open('model.pickle', "rb") as file:
-#     saved_model = pickle.load(file)
-# savedmodelpredictions = saved_model.predict(test_data_X)
-# print('Accuracy: {}'.format(100*accuracy_score(test_data_Y, savedmodelpredictions)))
+        best_kmeans = kmeans
+print('Accuracy achieved: {}'.format(max_accuracy*100))
+picklefilename = "best_model{}.pickle".format(max_accuracy*100)
+with open(picklefilename, "wb") as file:
+    pickle.dump(best_kmeans, file)
